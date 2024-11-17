@@ -1,4 +1,4 @@
-# Astra DB Chatbot Starter
+# A Chatbot build with NextJs, Groq, FASTApi, Astra DB, Langchain and Huggingface.
 
 ## Getting Started with Vercel
 
