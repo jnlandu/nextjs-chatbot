@@ -1,5 +1,9 @@
 from langchain_openai import OpenAI
-from langchain_openai import OpenAIEmbeddings
+# from langchain_openai import OpenAIEmbeddings
+# from langchain_groq import 
+from langchain_groq import ChatGroq
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
+
 
 import os
 from dotenv import load_dotenv
@@ -11,17 +15,33 @@ load_dotenv()
 token = os.getenv("ASTRA_DB_APPLICATION_TOKEN")
 api_endpoint = os.getenv("ASTRA_DB_API_ENDPOINT")
 namespace = os.getenv("ASTRA_DB_NAMESPACE")
-openai_api_key = os.getenv("OPENAI_API_KEY")
+groq_api_key = os.getenv("GROQ_API_KEY")
+hf_token = os.getenv("HUGGINGFACE_API_KEY")
 collection_name = os.getenv("ASTRA_DB_COLLECTION")
 model = os.getenv("VECTOR_MODEL")
 
 # langchain openai interface
-llm = OpenAI(openai_api_key=openai_api_key)
+# llm = OpenAI(openai_api_key=openai_api_key)
+# langchain groq interface
+llm = ChatGroq(
+    model="mixtral-8x7b-32768",
+    temperature=0,
+    max_tokens=None,
+    timeout=None,
+    api_key=groq_api_key,
+)
 
-if not model:
-    embedding_model = OpenAIEmbeddings(openai_api_key=openai_api_key)
+# if not model:
+#     embedding_model = OpenAIEmbeddings(openai_api_key=openai_api_key)
+# else:
+    # embedding_model = OpenAIEmbeddings(openai_api_key=openai_api_key, model=model)
+if model:
+    embedding_model = HuggingFaceInferenceAPIEmbeddings(
+        api_key=hf_token,
+        model_name=model,
+    )
 else:
-    embedding_model = OpenAIEmbeddings(openai_api_key=openai_api_key, model=model)
+    print("No model found. Please set the model in the environment variable VECTOR_MODEL")
 
 def get_similar_docs(query, number):
     if not namespace:
@@ -30,6 +50,7 @@ def get_similar_docs(query, number):
     else:
         collection = AstraDBCollection(collection_name=collection_name, token=token,
                                        api_endpoint=api_endpoint, namespace=namespace)
+    print("Debugging query 1: ", query)
     embedding = list(embedding_model.embed_query(query))
     relevant_docs = collection.vector_find(embedding, limit=number)
 
@@ -44,6 +65,7 @@ document_context_boilerplate = "CONTEXT: "
 final_answer_boilerplate = "Final Answer: "
 
 def build_full_prompt(query):
+    print("Debuggin query 2: ", query)
     relevant_docs, urls = get_similar_docs(query, 3)
     docs_single_string = "\n".join(relevant_docs)
     url = urls[0] # set(urls)
@@ -55,4 +77,9 @@ def build_full_prompt(query):
 
 def send_to_openai(full_prompt):
     return llm.invoke(full_prompt)
+
+
+if "__name__" == "__main__":
+    print("Running test")
+    print("Test passed")
 

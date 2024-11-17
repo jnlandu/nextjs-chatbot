@@ -3,7 +3,11 @@ import os
 
 import split_q_and_a
 
-from langchain_openai import OpenAIEmbeddings
+# from langchain_openai import OpenAIEmbeddings
+# from langchain.embeddings import HuggingFaceHubEmbeddings
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
+# from huggingface_hub import login
+
 
 import time
 
@@ -14,21 +18,62 @@ from astrapy.db import AstraDBCollection
 
 load_dotenv()
 
+
 # Grab the Astra token and api endpoint from the environment
 token = os.getenv("ASTRA_DB_APPLICATION_TOKEN")
 api_endpoint = os.getenv("ASTRA_DB_API_ENDPOINT")
 namespace = os.getenv("ASTRA_DB_NAMESPACE")
-openai_api_key = os.getenv("OPENAI_API_KEY")
+openai_api_key = os.getenv("GROQ_API_KEY")
 collection_name = os.getenv("ASTRA_DB_COLLECTION")
 dimension = os.getenv("VECTOR_DIMENSION")
-openai_api_key=os.getenv("OPENAI_API_KEY")
-input_data = os.getenv("SCRAPED_FILE")
-model = os.getenv("VECTOR_MODEL")
+model = os.getenv("MODEL")
+# input_data = os.getenv("SCRAPED_FILE")
+hf_token = os.getenv("HUGGINGFACE_API_KEY")
 
-if not model:
-    embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
+# print(f"Using Model: {model}")
+
+
+SCRAPED_FILE="./scrape/scraped_results.json"
+input_data = SCRAPED_FILE
+# model = MODEL
+
+# if not hf_token:
+#     print("No Hugging Face token found. Please set the Hugging Face token in the environment variable HUGGINGFACE_TOKEN")
+# else:
+#     login(token=hf_token)
+#     print("Login successfull to Hugging Face Hub")
+#     print(f"Using Hugging Face token: {hf_token}")
+
+# if not model:
+#     # embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
+#     embeddings =HuggingFaceInferenceAPIEmbeddings()
+# else:
+if model:
+    # embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key, model=model)
+    embeddings =HuggingFaceInferenceAPIEmbeddings(
+        api_key=hf_token,
+        model_name=model,
+    )
+    print(f"Using model: {model}")
+    # text = "This is a test document"
+    # query_result = embeddings.embed_query(text)
+    # print(f"Test embedding: {query_result[:3]}")
 else:
-    embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key, model=model)
+    print("No model found. Please set the model in the environment variable VECTOR_MODEL")
+    print("Using the default model: deepset/sentence_bert"),
+    embeddings = HuggingFaceInferenceAPIEmbeddings(
+        api_key=hf_token,
+        model_name="intfloat/multilingual-e5-large",
+    )
+    print(f"Using model: {model}")
+
+if not input_data:
+    print("No input data found. Please set the input data in the environment variable SCRAPED_FILE")
+    print("Using the default input data: scraped_results.json")
+    input_data = "scraped_results.json"
+
+else:
+    print(f"Using input data: {input_data}")
 
 def get_input_data():
     scraped_results_file = input_data
