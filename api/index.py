@@ -29,7 +29,11 @@ async def root():
 
 @app.post("/api/chat")
 async def fill_and_send_prompt(query: Query):
-    print("Debugging query 0: ", query)
-    print("Debugging query.prompt: ", query.prompt)
+    # print("Debugging query 0: ", query)
+    # print("Debugging query.prompt: ", query.prompt)
     docs, url = build_full_prompt(query.prompt)
-    return json.dumps({"text": send_to_openai(docs), "url" : url})
+    # print("--- debugging -----")
+    # print("Docs type", type(docs))
+    # print("Debugging docs: ",docs)
+    # print("===== end debugging =====")
+    return json.dumps({"text": send_to_groq(docs), "url" : url})

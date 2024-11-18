@@ -1,6 +1,7 @@
 import json
 import os
 
+
 import split_q_and_a
 
 # from langchain_openai import OpenAIEmbeddings
@@ -15,24 +16,20 @@ from dotenv import load_dotenv
 from astrapy.db import AstraDBCollection
 
 #To do: add logger
-
-load_dotenv()
+load_dotenv() 
 
 
 # Grab the Astra token and api endpoint from the environment
 token = os.getenv("ASTRA_DB_APPLICATION_TOKEN")
 api_endpoint = os.getenv("ASTRA_DB_API_ENDPOINT")
 namespace = os.getenv("ASTRA_DB_NAMESPACE")
-openai_api_key = os.getenv("GROQ_API_KEY")
-collection_name = os.getenv("ASTRA_DB_COLLECTION")
+collection_name = os.getenv("ASTRADB_COLLECTION")
 dimension = os.getenv("VECTOR_DIMENSION")
 model = os.getenv("MODEL")
-# input_data = os.getenv("SCRAPED_FILE")
 hf_token = os.getenv("HUGGINGFACE_API_KEY")
 
+
 # print(f"Using Model: {model}")
-
-
 SCRAPED_FILE="./scrape/scraped_results.json"
 input_data = SCRAPED_FILE
 # model = MODEL
@@ -55,9 +52,6 @@ if model:
         model_name=model,
     )
     print(f"Using model: {model}")
-    # text = "This is a test document"
-    # query_result = embeddings.embed_query(text)
-    # print(f"Test embedding: {query_result[:3]}")
 else:
     print("No model found. Please set the model in the environment variable VECTOR_MODEL")
     print("Using the default model: deepset/sentence_bert"),
@@ -102,7 +96,9 @@ def main():
 
     # process faq data
     for webpage in input_data_faq:
+        print("Debugging webpage: ", webpage)
         q_and_a_data = split_q_and_a.split(webpage)
+        print("Debugging q_and_b_data: ", len(q_and_a_data["questions"]))
         for i in range (0,len(q_and_a_data["questions"])):
             document_id = webpage["url"]
             question_id = i + 1

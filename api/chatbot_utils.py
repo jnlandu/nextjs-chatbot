@@ -1,15 +1,14 @@
-from langchain_openai import OpenAI
-# from langchain_openai import OpenAIEmbeddings
-# from langchain_groq import 
+import sys
 from langchain_groq import ChatGroq
 from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 
 
 import os
+import json
 from dotenv import load_dotenv
 from astrapy.db import AstraDBCollection
 
-load_dotenv()
+load_dotenv(verbose=True) 
 
 # Grab the Astra token and api endpoint from the environment
 token = os.getenv("ASTRA_DB_APPLICATION_TOKEN")
@@ -19,6 +18,7 @@ groq_api_key = os.getenv("GROQ_API_KEY")
 hf_token = os.getenv("HUGGINGFACE_API_KEY")
 collection_name = os.getenv("ASTRA_DB_COLLECTION")
 model = os.getenv("VECTOR_MODEL")
+
 
 # langchain openai interface
 # llm = OpenAI(openai_api_key=openai_api_key)
@@ -50,7 +50,6 @@ def get_similar_docs(query, number):
     else:
         collection = AstraDBCollection(collection_name=collection_name, token=token,
                                        api_endpoint=api_endpoint, namespace=namespace)
-    print("Debugging query 1: ", query)
     embedding = list(embedding_model.embed_query(query))
     relevant_docs = collection.vector_find(embedding, limit=number)
 
@@ -65,21 +64,23 @@ document_context_boilerplate = "CONTEXT: "
 final_answer_boilerplate = "Final Answer: "
 
 def build_full_prompt(query):
-    print("Debuggin query 2: ", query)
     relevant_docs, urls = get_similar_docs(query, 3)
     docs_single_string = "\n".join(relevant_docs)
+
+    if not urls:
+        print("No URLs found for the given query")
     url = urls[0] # set(urls)
 
     nl = "\n"
     filled_prompt_template = prompt_boilerplate + nl + user_query_boilerplate+ query + nl + document_context_boilerplate + docs_single_string + nl + final_answer_boilerplate
-    print(filled_prompt_template)
     return filled_prompt_template, url
 
-def send_to_openai(full_prompt):
-    return llm.invoke(full_prompt)
+def send_to_groq(full_prompt):
+    response = llm.invoke(full_prompt)
+    return json.dumps(response.content)
 
 
-if "__name__" == "__main__":
+if __name__ == "__main__":
     print("Running test")
     print("Test passed")
 
