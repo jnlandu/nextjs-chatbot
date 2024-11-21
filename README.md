@@ -24,7 +24,7 @@ Set python virtual environment on linux
 - ASTRA_DB_COLLECTION=Name of collection/table to be created in Astra database
 - VECTOR_DIMENSION=Collection to be created with number of vector dimensions
 - SCRAPED_FILE=Scraped data file location
-- OPENAI_API_KEY=api key for OPENAI
+- GROQ_API_KEY=api key for GROQ API KEY
 - VECTOR_MODEL = Vector Model to be used. Future, models are expected to change due to deprecation and expect new model to be used 
 
 2. Install Python dependencies:
