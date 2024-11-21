@@ -96,9 +96,7 @@ def main():
 
     # process faq data
     for webpage in input_data_faq:
-        print("Debugging webpage: ", webpage)
         q_and_a_data = split_q_and_a.split(webpage)
-        print("Debugging q_and_b_data: ", len(q_and_a_data["questions"]))
         for i in range (0,len(q_and_a_data["questions"])):
             document_id = webpage["url"]
             question_id = i + 1
