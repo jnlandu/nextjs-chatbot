@@ -1,4 +1,4 @@
-# A Chatbot build with NextJs, Groq, FASTApi, Astra DB, Langchain and Huggingface.
+# A Chatbot build with NextJs, Groq, FASTApi, Astra DB, Langchain and Hugging Face.
 
 ## Getting Started with Vercel
 
@@ -9,7 +9,7 @@
   
    Set your environment variables to the values created in steps 1 and 3.
 ##
-Set python virtual environment on linux
+Set python virtual environment on  os or linux:
    apt-get install python3.11-venv
    python3 -m venv venv
    source venv/bin/activate
@@ -41,3 +41,11 @@ python populate_db/create_collection.py
 ```
 python populate_db/load_data.py
 ```
+
+
+## Future:
+1. Integrate Langchain for language translation
+2. Integrate Mutlimodal AI for image and text processing
+3. Specialize the chatbot for specific use cases, such as customer service, e-commerce, or healthcare.
+
+
